@@ -12,7 +12,7 @@ class UserMovement
   SF_latitude = -122.456667
 
   def initialize
-    puts "1. make sample or \n2. read_csv?"
+    puts "1. make sample or \n2. read_csv or \n3. analyze data?"
     print "> "
     action = gets.chomp().to_i
     
@@ -22,6 +22,8 @@ class UserMovement
     elsif action == 2
       sample_users = prompt()
       read_csv(sample_users)
+    elsif action == 3
+      analyze_user_data()
     end;
   end
 
@@ -92,8 +94,8 @@ class UserMovement
     # redo user movements to capture for n users
     for n in (1..n_sample_users)
       if n == 1
-        File.delete(sf_db) if File.exist?(sf_db);
-        db = SQLite3::Database.new( sf_db );
+        File.delete("sf_db.sqlite3") if File.exist?("sf_db.sqlite3");
+        db = SQLite3::Database.new("sf_db.sqlite3");
 
         # create table for schedule
         db.execute("CREATE TABLE user_data (
@@ -107,10 +109,15 @@ class UserMovement
       # open new CSV for user
       #CSV.open("user_#{n}.csv", "r") do |csv|
       CSV.foreach("user_#{n}.csv") do |row|
-        db.execute( "INSERT INTO game_stats (user, date, longitude, latitude) VALUES 
+        db.execute( "INSERT INTO user_data (user, date, longitude, latitude) VALUES 
           ('#{n}', '#{row[0]}', '#{row[1]}', '#{row[2]}') ;")
       end
     end
+  end
+
+  def analyze_user_data()
+    db = SQLite3::Database.open "sf_db.sqlite3"
+
   end
 end
 
