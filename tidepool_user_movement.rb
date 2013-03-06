@@ -225,6 +225,7 @@ class UserMovement
     users_near_q2 = db.execute("SELECT date_time FROM user_data WHERE 
       (longitude BETWEEN #{lower_long} AND #{upper_long} AND latitude BETWEEN #{upper_lat} AND #{lower_lat});")
 
+
     print "\nLocation had ", users_near_q2.count, " user(s) throughout the day\n"
     print users_near_q2.sort
     puts ""
