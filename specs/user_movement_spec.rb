@@ -11,5 +11,5 @@ latitudes_lookup = [-122.429914, -122.431361, -122.418523]
 make_sf_user_data.Q1_analyze_user_data(10, longitudes_lookup, latitudes_lookup)
 # question 2
 make_sf_user_data.Q2_analyze_user_data(37.758973, -122.429914)
-
+# question 3
 #make_sf_user_data.Q3_analyze_user_data(37.758973, -122.429914, 1, 2)

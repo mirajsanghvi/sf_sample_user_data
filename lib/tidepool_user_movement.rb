@@ -21,19 +21,22 @@ class UserMovement
 
   def initialize()
     @db_name2 = "sf_db.sqlite3"
+    make_db()
   end
 
   def make_user_data(n_sample_users)
-    # make db to write to
-    make_db()
     # open db to work with
     db = SQLite3::Database.open @db_name2
 
+    db.execute("BEGIN TRANSACTION");
+
     # redo user movements to capture for n users
     for n in (1..n_sample_users)
+      #db_user_data = db.prepare( "INSERT INTO user_data (user, date_time, longitude, latitude) VALUES (?, ?, ?, ?) ") 
+
       # open new CSV for user
       CSV.open("csv/user_#{n}.csv", "w") do |csv|
-
+      
         # reiterate for ts for a given timestamp
         # use base of 90 timestamps with max of 111 timestamps for a given user
         for ts in (1..(90 + rand(20)))
@@ -91,14 +94,18 @@ class UserMovement
           csv << [time_stamp, user_long, user_lat]
 
           # write to db
-          db.execute( "INSERT INTO user_data (user, date_time, longitude, latitude) VALUES 
-            ('#{n}', '#{time_stamp}', '#{user_long}', '#{user_lat}') ;") 
+          db.execute( "INSERT INTO user_data (user, date_time, longitude, latitude) VALUES ('#{n}', '#{time_stamp}', '#{user_long}', '#{user_lat}') ;") 
+          
+          #db_user_data.execute(n, time_stamp, user_long, user_lat)
         end
+
         print  user_long, " ", user_lat, "\n"
         # puts "_" * 20
       end
     end
-
+    
+    # commit db insertions
+    db.execute("COMMIT");
     #read in csv to database
     #read_csv(n_sample_users)
     db.close
@@ -116,7 +123,7 @@ class UserMovement
       latitude INTEGER
     );")
 
-    db.close()
+    db.close
   end
 
   def read_csv(n_sample_users)
@@ -189,19 +196,3 @@ class UserMovement
     puts ""
   end
 end
-
-
-#make_sf_user_data = UserMovement.new()
-
-# make_sf_user_data.make_user_data(1000)
-
-#longitudes_lookup = [37.758973, 37.77771, 37.764514]
-#latitudes_lookup = [-122.429914, -122.431361, -122.418523]
-
-# question 1
-#make_sf_user_data.Q1_analyze_user_data(10, longitudes_lookup, latitudes_lookup)
-# question 2
-#make_sf_user_data.Q2_analyze_user_data(37.758973, -122.429914)
-
-# Q3_analyze_user_data(37.758973, -122.429914, 1, 2)
-
