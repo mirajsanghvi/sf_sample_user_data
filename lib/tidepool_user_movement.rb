@@ -27,7 +27,7 @@ class UserMovement
     action = gets.chomp().to_i
     
     if action == 1
-      sample_users = 1000
+      sample_users = 50
       make_user_data(db_name, sample_users)
     elsif action == 2
       analyze_user_data(db_name)
@@ -43,7 +43,7 @@ class UserMovement
     # redo user movements to capture for n users
     for n in (1..n_sample_users)
       # open new CSV for user
-      CSV.open("user_#{n}.csv", "w") do |csv|
+      CSV.open("csv/user_#{n}.csv", "w") do |csv|
 
         # reiterate for ts for a given timestamp
         # use base of 90 timestamps with max of 111 timestamps for a given user
@@ -139,7 +139,7 @@ class UserMovement
     for n in (1..n_sample_users)
       # open new CSV for user
       #CSV.open("user_#{n}.csv", "r") do |csv|
-      CSV.foreach("user_#{n}.csv") do |row|
+      CSV.foreach("csv/user_#{n}.csv") do |row|
         db.execute( "INSERT INTO user_data (user, date_time, longitude, latitude) VALUES 
           ('#{n}', '#{row[0]}', '#{row[1]}', '#{row[2]}') ;")
       end
