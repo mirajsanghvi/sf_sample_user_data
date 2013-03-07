@@ -19,26 +19,33 @@ class UserMovement
   Difference_100m = 0.0001
 
 
-  def initialize
-    db_name = "sf_db.sqlite3"
+  def initialize()
+    @db_name2 = "sf_db.sqlite3"
     
     puts "1) make sample and read_csv or \n2) analyze data?"
     print "> "
     action = gets.chomp().to_i
     
     if action == 1
-      sample_users = 50
-      make_user_data(db_name, sample_users)
+      sample_users = 1000
+      make_user_data(sample_users)
     elsif action == 2
-      analyze_user_data(db_name)
-    end;
+      longitudes_lookup = [37.758973, 37.77771, 37.764514]
+      latitudes_lookup = [-122.429914, -122.431361, -122.418523]
+
+      Q1_analyze_user_data(10, longitudes_lookup, latitudes_lookup)
+
+      Q2_analyze_user_data(37.758973, -122.429914)
+
+      # Q3_analyze_user_data(37.758973, -122.429914, 1, 2)
+    end
   end
 
-  def make_user_data(db_name, n_sample_users)
+  def make_user_data(n_sample_users)
     # make db to write to
-    make_db(db_name)
+    make_db()
     # open db to work with
-    db = SQLite3::Database.open db_name
+    db = SQLite3::Database.open @db_name2
 
     # redo user movements to capture for n users
     for n in (1..n_sample_users)
@@ -68,8 +75,8 @@ class UserMovement
           # 100 chances to end up in sqaure space
           for k in 0..100
             #create new random movements for users
-            long_random = (rand(Square_size_num).to_f / (Square_size_denom * 10) )
-            lat_random = (rand(Square_size_num).to_f / (Square_size_denom * 10) )
+            long_random = (rand(Square_size_num/2).to_f / (Square_size_denom * 10) )
+            lat_random = (rand(Square_size_num/2).to_f / (Square_size_denom * 10) )
 
             # to randomize movement in any direction
             random_movement = rand(4)
@@ -95,18 +102,15 @@ class UserMovement
           end
 
           # round values
-          user_long6 = user_long.round(6)
-          user_lat6 = user_lat.round(6)
+          user_long = user_long.round(6)
+          user_lat = user_lat.round(6)
 
           # write to CSV
-          csv << [time_stamp, user_long6, user_lat6]
+          csv << [time_stamp, user_long, user_lat]
 
           # write to db
           db.execute( "INSERT INTO user_data (user, date_time, longitude, latitude) VALUES 
-            ('#{n}', '#{time_stamp}', '#{user_long6}', '#{user_lat6}') ;")
-
-          # print  user_long, " ", user_lat, "\n"
-          #print rand(4)
+            ('#{n}', '#{time_stamp}', '#{user_long}', '#{user_lat}') ;") 
         end
         print  user_long, " ", user_lat, "\n"
         # puts "_" * 20
@@ -114,13 +118,13 @@ class UserMovement
     end
 
     #read in csv to database
-    #read_csv(db_name, n_sample_users)
+    #read_csv(n_sample_users)
     db.close
   end
 
-  def make_db(db_name)
-    File.delete(db_name) if File.exist?(db_name);
-    db = SQLite3::Database.new(db_name);
+  def make_db()
+    File.delete(@db_name2) if File.exist?(@db_name2);
+    db = SQLite3::Database.new(@db_name2);
 
     # create table for schedule
     db.execute("CREATE TABLE user_data (
@@ -133,8 +137,8 @@ class UserMovement
     db.close()
   end
 
-  def read_csv(db_name, n_sample_users)
-    make_db(db_name)
+  def read_csv(n_sample_users)
+    make_db()
 
     for n in (1..n_sample_users)
       # open new CSV for user
@@ -146,8 +150,8 @@ class UserMovement
     end
   end
 
-  def Q1_analyze_user_data(db_name, time_to_lookup_q1_hour, longitudes_lookup, latitudes_lookup)
-    db = SQLite3::Database.open db_name
+  def Q1_analyze_user_data(time_to_lookup_q1_hour, longitudes_lookup, latitudes_lookup)
+    db = SQLite3::Database.open @db_name2
     
     # enter hour to time to get range to check for
     time_to_lookup_q1 = Time.new( 2013, 03, 05, time_to_lookup_q1_hour )
@@ -169,8 +173,8 @@ class UserMovement
     end
   end
 
-  def Q2_analyze_user_data(db_name, longitudes_lookup_q2, latitudes_lookup_q2)
-    db = SQLite3::Database.open db_name
+  def Q2_analyze_user_data(longitudes_lookup_q2, latitudes_lookup_q2)
+    db = SQLite3::Database.open @db_name2
 
     # check database to see how many times location has been visited
     upper_long = (longitudes_lookup_q2 + Difference_100m)
@@ -186,8 +190,8 @@ class UserMovement
     puts ""
   end
 
-  def Q3_analyze_user_data(db_name, longitudes_lookup_q3, latitudes_lookup_q3, question3_user1, question3_user2)
-    db = SQLite3::Database.open db_name
+  def Q3_analyze_user_data(longitudes_lookup_q3, latitudes_lookup_q3, question3_user1, question3_user2)
+    db = SQLite3::Database.open @db_name2
 
     # check database to see how many times location has been visited
     upper_long = (longitudes_lookup_q3 + Difference_100m)
@@ -201,18 +205,6 @@ class UserMovement
     print "\nLocation had ", users1_q3.count, " user(s) throughout the day\n"
     print users1_q3
     puts ""
-  end
-
-  def analyze_user_data(db_name)
-
-    longitudes_lookup = [37.758973, 37.77771, 37.764514]
-    latitudes_lookup = [-122.429914, -122.431361, -122.418523]
-
-    Q1_analyze_user_data(db_name, 16, longitudes_lookup, latitudes_lookup)
-
-    Q2_analyze_user_data(db_name, 37.758973, -122.429914)
-
-    Q3_analyze_user_data(db_name, 37.758973, -122.429914, 1, 2)
   end
 end
 
