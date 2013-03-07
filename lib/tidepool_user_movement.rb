@@ -21,24 +21,6 @@ class UserMovement
 
   def initialize()
     @db_name2 = "sf_db.sqlite3"
-    
-    puts "1) make sample and read_csv or \n2) analyze data?"
-    print "> "
-    action = gets.chomp().to_i
-    
-    if action == 1
-      sample_users = 1000
-      make_user_data(sample_users)
-    elsif action == 2
-      longitudes_lookup = [37.758973, 37.77771, 37.764514]
-      latitudes_lookup = [-122.429914, -122.431361, -122.418523]
-
-      Q1_analyze_user_data(10, longitudes_lookup, latitudes_lookup)
-
-      Q2_analyze_user_data(37.758973, -122.429914)
-
-      # Q3_analyze_user_data(37.758973, -122.429914, 1, 2)
-    end
   end
 
   def make_user_data(n_sample_users)
@@ -208,4 +190,18 @@ class UserMovement
   end
 end
 
-make_csvs = UserMovement.new()
+
+#make_sf_user_data = UserMovement.new()
+
+# make_sf_user_data.make_user_data(1000)
+
+#longitudes_lookup = [37.758973, 37.77771, 37.764514]
+#latitudes_lookup = [-122.429914, -122.431361, -122.418523]
+
+# question 1
+#make_sf_user_data.Q1_analyze_user_data(10, longitudes_lookup, latitudes_lookup)
+# question 2
+#make_sf_user_data.Q2_analyze_user_data(37.758973, -122.429914)
+
+# Q3_analyze_user_data(37.758973, -122.429914, 1, 2)
+
