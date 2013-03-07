@@ -15,6 +15,11 @@ class UserMovement
   SF_longitude = 37.743333
   SF_latitude = -122.396667
   Square_size = 0.040000
+  Square_size_num = 40000
+  Square_size_denom = 1000000
+  # allow for 100m difference
+  difference_100m = 0.0001
+
 
   def initialize
     puts "1) make sample and read_csv or \n2) analyze data?"
@@ -50,7 +55,7 @@ class UserMovement
             
             # from start position we want users to be anywhere in box to start
             # we use 0.04 as mox area for users to move around - this allows users to start anywhere in box area in SF
-            rand_start_spot = (rand(40000).to_f / 1000000 )
+            rand_start_spot = (rand(Square_size_num).to_f / Square_size_denom )
             user_long = SF_longitude + rand_start_spot
             user_lat = SF_latitude - rand_start_spot
              print  user_long, " ", user_lat, " to "
@@ -61,10 +66,11 @@ class UserMovement
           # random interval up to 10 minutes
           time_stamp = time_stamp + rand(600)
 
+          # 100 chances to end up in sqaure space
           for k in 0..100
             #create new random movements for users
-            long_random = (rand(20000).to_f / 10000000 )
-            lat_random = (rand(20000).to_f / 10000000 )
+            long_random = (rand(Square_size_num).to_f / (Square_size_denom * 10) )
+            lat_random = (rand(Square_size_num).to_f / (Square_size_denom * 10) )
 
             # to randomize movement in any direction
             random_movement = rand(4)
@@ -129,9 +135,7 @@ class UserMovement
     end
   end
 
-  def analyze_user_data()
-    db = SQLite3::Database.open "sf_db.sqlite3"
-
+  def Q1_analyze_user_data()
     ## Question 1
 
     # prompt to figure out if use own coordinates or preloaded ones
@@ -190,31 +194,29 @@ class UserMovement
       print "\nLocation #{long_lat_lookup} had ", users_near.count, " user(s) "
       puts ""
     end
+  end
 
-
+  def Q2_analyze_user_data(longitudes_lookup_q2, latitudes_lookup_q2)
     ## Question 2
     puts ""
 
     # prompt to figure out if use own coordinates or preloaded ones
-    puts "Question 2:", "Would you like to: \n 1) enter your own coordinates or \n 2) use a preloaded one?"
-    print "> "
-    question2 = gets.chomp().to_i
+    #puts "Question 2:", "Would you like to: \n 1) enter your own coordinates or \n 2) use a preloaded one?"
+    #print "> "
+    #question2 = gets.chomp().to_i
 
-    if question2 == 1
-      puts "enter longitude and latitude data of a location to learn more about:"
+    #if question2 == 1
+    #  puts "enter longitude and latitude data of a location to learn more about:"
       # store locations in an array
-      print "longitude > "
-      longitudes_lookup_q2 = gets.chomp().to_i
-      print "longitude > "
-      latitudes_lookup_q2 = gets.chomp().to_i
-    elsif question2 == 2
+    #  print "longitude > "
+    #  longitudes_lookup_q2 = gets.chomp().to_i
+    #  print "longitude > "
+    #  latitudes_lookup_q2 = gets.chomp().to_i
+    #elsif question2 == 2
       # sample spot 1
-      longitudes_lookup_q2 = 37.758973
-      latitudes_lookup_q2 = -122.429914
-    end
-
-    # allow for 100m difference
-    difference_100m = 0.0001
+    #  longitudes_lookup_q2 = 37.758973
+    #  latitudes_lookup_q2 = -122.429914
+    #end
 
     # check database to see how many times location has been visited
     upper_long = (longitudes_lookup_q2 + difference_100m)
@@ -229,20 +231,15 @@ class UserMovement
     print "\nLocation had ", users_near_q2.count, " user(s) throughout the day\n"
     print users_near_q2.sort
     puts ""
+  end
 
-
-    ## Question 3
-    puts ""
-
+  def Q3_analyze_user_data(question3_user1, question3_user2)
     # prompt to figure out if use own coordinates or preloaded ones
-    puts "Question 3:", "Enter 2 users to test how often they end up 100m of each other?"
-    print "1st User > "
-    question3_user1 = gets.chomp().to_i
-    print "2nd User > "
-    question3_user2 = gets.chomp().to_i
-
-    # allow for 100m difference
-    difference_100m = 0.0001
+    #puts "Question 3:", "Enter 2 users to test how often they end up 100m of each other?"
+    #print "1st User > "
+    #question3_user1 = gets.chomp().to_i
+    #print "2nd User > "
+    #question3_user2 = gets.chomp().to_i
 
     # check database to see how many times location has been visited
     upper_long = (longitudes_lookup_q2 + difference_100m)
@@ -256,6 +253,16 @@ class UserMovement
     print "\nLocation had ", users1_q3.count, " user(s) throughout the day\n"
     print users1_q3
     puts ""
+  end
+
+  def analyze_user_data()
+    db = SQLite3::Database.open "sf_db.sqlite3"
+
+    Q1_analyze_user_data()
+
+    Q2_analyze_user_data(37.758973, -122.429914)
+
+    Q3_analyze_user_data(1,2)
   end
 end
 
